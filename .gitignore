@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.svelte-kit/
+.turbo/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.sqlite
+openlocale.db*
+coverage/
+playwright-report/
+test-results/

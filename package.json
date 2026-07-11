@@ -1,0 +1,23 @@
+{
+  "name": "openlocale",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=web",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:pg": "OPENLOCALE_TEST_PG=1 turbo run test --filter=@openlocale/db --filter=@openlocale/api",
+    "db:generate": "pnpm --filter @openlocale/db db:generate",
+    "db:migrate": "pnpm --filter @openlocale/db db:migrate",
+    "seed": "pnpm --filter @openlocale/seed start"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.8.3"
+  }
+}
