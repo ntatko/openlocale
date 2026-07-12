@@ -1,4 +1,5 @@
 import { and, asc, eq } from "drizzle-orm";
+import { buildIndex, findMatch, type Candidate } from "@openlocale/dedupe";
 import type { DbHandle } from "../client.js";
 import type { EventBus } from "../events.js";
 import { newId } from "../ids.js";
@@ -16,7 +17,33 @@ export type AnalyzeStats = {
   create: number;
   update: number;
   unchanged: number;
+  duplicates: number;
 };
+
+/**
+ * Existing translations for the import's locale, joined with their key names,
+ * as dedupe candidates.
+ */
+async function dedupeCandidates(
+  handle: DbHandle,
+  projectId: string,
+  locale: string
+): Promise<Candidate[]> {
+  const t = tables(handle);
+  const rows = await dbOf(handle)
+    .select({
+      keyId: t.translations.keyId,
+      keyName: t.translationKeys.name,
+      value: t.translations.value,
+      valueHash: t.translations.valueHash,
+      normalizedHash: t.translations.normalizedHash,
+      archived: t.translationKeys.archived
+    })
+    .from(t.translations)
+    .innerJoin(t.translationKeys, eq(t.translations.keyId, t.translationKeys.id))
+    .where(and(eq(t.translations.projectId, projectId), eq(t.translations.locale, locale)));
+  return rows.filter((r) => !r.archived);
+}
 
 /**
  * Stage an import: parse results become import_entries rows with a planned
@@ -36,13 +63,24 @@ export async function createJob(
   }
 ): Promise<{ job: ImportJob; stats: AnalyzeStats }> {
   const t = tables(handle);
-  const stats: AnalyzeStats = { total: input.entries.length, create: 0, update: 0, unchanged: 0 };
+  const stats: AnalyzeStats = {
+    total: input.entries.length,
+    create: 0,
+    update: 0,
+    unchanged: 0,
+    duplicates: 0
+  };
+
+  const dedupeIndex = buildIndex(
+    await dedupeCandidates(handle, input.project.id, input.locale)
+  );
 
   return withTx(handle, async (tx) => {
     const db = dbOf(handle, tx);
     const jobId = newId();
 
     const staged: (typeof t.importEntries.$inferInsert)[] = [];
+    const suggestions: (typeof t.dedupeSuggestions.$inferInsert)[] = [];
     for (const entry of input.entries) {
       const existingKey = await db
         .select()
@@ -81,6 +119,26 @@ export async function createJob(
         plannedAction: planned,
         resolution: null
       });
+
+      // a brand-new key whose value matches an existing translation is a
+      // likely duplicate — surface it for review instead of silently creating
+      if (planned === "create") {
+        const match = findMatch(entry.value, dedupeIndex);
+        if (match && match.keyName !== entry.key) {
+          stats.duplicates++;
+          suggestions.push({
+            id: newId(),
+            jobId,
+            projectId: input.project.id,
+            incomingKey: entry.key,
+            incomingValue: entry.value,
+            matchedKeyId: match.keyId,
+            matchType: match.matchType,
+            score: match.score,
+            status: "pending"
+          });
+        }
+      }
     }
 
     const [job] = await db
@@ -102,6 +160,11 @@ export async function createJob(
       // chunk inserts to stay under parameter limits
       for (let i = 0; i < staged.length; i += 500) {
         await db.insert(t.importEntries).values(staged.slice(i, i + 500));
+      }
+    }
+    if (suggestions.length > 0) {
+      for (let i = 0; i < suggestions.length; i += 500) {
+        await db.insert(t.dedupeSuggestions).values(suggestions.slice(i, i + 500));
       }
     }
 
