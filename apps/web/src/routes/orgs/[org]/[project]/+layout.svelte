@@ -5,6 +5,7 @@
 
 	const tabs = $derived([
 		{ href: `/orgs/${data.org.slug}/${data.project.slug}`, label: 'Editor' },
+		{ href: `/orgs/${data.org.slug}/${data.project.slug}/import`, label: 'Import / Export' },
 		{ href: `/orgs/${data.org.slug}/${data.project.slug}/audit`, label: 'Audit' }
 	]);
 </script>

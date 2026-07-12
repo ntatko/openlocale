@@ -4,4 +4,7 @@ export * as audit from "./audit.js";
 export * as keys from "./keys.js";
 export * as users from "./users.js";
 export * as tokens from "./tokens.js";
+export * as imports from "./imports.js";
+export * as aliases from "./aliases.js";
+export * as dedupe from "./dedupe.js";
 export * as translations from "./translations.js";

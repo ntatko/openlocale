@@ -1,0 +1,26 @@
+{
+  "name": "@openlocale/formats",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Parsers and serializers for common i18n file formats (JSON, YAML, PO, XLIFF, CSV, .strings, Android XML, .properties, ARB)",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.2.5",
+    "gettext-parser": "^8.0.0",
+    "papaparse": "^5.5.3",
+    "yaml": "^2.8.0"
+  },
+  "devDependencies": {
+    "@types/gettext-parser": "^8.0.0",
+    "@types/papaparse": "^5.3.16",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
