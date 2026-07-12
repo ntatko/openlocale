@@ -21,6 +21,8 @@ export type DbHandle = {
   dialect: Dialect;
   /** Underlying better-sqlite3 connection (sqlite dialect only) — used by withTx. */
   rawSqlite?: InstanceType<typeof Database>;
+  /** Underlying postgres.js client (pg dialect only) — used by the event bus for LISTEN/NOTIFY. */
+  rawPg?: ReturnType<typeof postgres>;
   close: () => Promise<void>;
 };
 
@@ -37,6 +39,7 @@ export function createDb(opts?: { url?: string }): DbHandle {
     return {
       db,
       dialect: "pg",
+      rawPg: client,
       close: async () => {
         await client.end();
       }

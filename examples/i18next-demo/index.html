@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>openlocale live demo</title>
+		<style>
+			body {
+				font-family: system-ui, sans-serif;
+				max-width: 640px;
+				margin: 80px auto;
+				padding: 0 20px;
+			}
+			h1 {
+				font-size: 2rem;
+			}
+			.badge {
+				display: inline-block;
+				font-size: 12px;
+				padding: 2px 10px;
+				border-radius: 99px;
+				background: #eef;
+				margin-bottom: 24px;
+			}
+			.flash {
+				animation: flash 0.8s ease-out;
+			}
+			@keyframes flash {
+				from {
+					background: #ffee99;
+				}
+				to {
+					background: transparent;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<span class="badge" id="status">connecting…</span>
+		<h1 id="title"></h1>
+		<p id="body"></p>
+		<button id="cta"></button>
+		<p><small>Edit these strings in the openlocale UI — they update here without a reload.</small></p>
+		<script type="module" src="/src/main.ts"></script>
+	</body>
+</html>

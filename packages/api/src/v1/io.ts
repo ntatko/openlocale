@@ -251,6 +251,38 @@ export function registerIoRoutes(app: OpenAPIHono<ApiEnv>) {
 
   app.openapi(
     createRoute({
+      method: "get",
+      path: "/v1/imports/{jobId}/suggestions",
+      tags: ["import-export"],
+      summary: "List dedupe suggestions for an import job",
+      request: { params: z.object({ jobId: z.string() }) },
+      responses: { 200: { description: "suggestions" } }
+    }),
+    async (c) => {
+      const { jobId } = c.req.valid("param");
+      const { handle } = c.get("ctx");
+      const job = await repos.imports.byId(handle, jobId);
+      if (!job) throw new ApiError(404, "NOT_FOUND", "import job not found");
+      const project = await repos.projects.byId(handle, job.projectId);
+      await requireProjectAccess(c, project!.slug, "project.import");
+      const suggestions = await repos.dedupe.listForJob(handle, jobId);
+      return c.json(
+        suggestions.map((s) => ({
+          id: s.id,
+          incomingKey: s.incomingKey,
+          incomingValue: s.incomingValue,
+          matchedKeyId: s.matchedKeyId,
+          matchType: s.matchType,
+          score: s.score,
+          status: s.status
+        })),
+        200
+      );
+    }
+  );
+
+  app.openapi(
+    createRoute({
       method: "post",
       path: "/v1/imports/{jobId}/suggestions/{suggestionId}",
       tags: ["import-export"],

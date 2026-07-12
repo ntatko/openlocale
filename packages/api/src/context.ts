@@ -25,6 +25,6 @@ export async function createContext(opts?: { dbUrl?: string }): Promise<AppConte
   const handle = createDb({ url: opts?.dbUrl });
   await runMigrations(handle);
   const auth = createAuth(handle);
-  const bus = createEventBus();
+  const bus = createEventBus(handle);
   return { handle, auth, bus };
 }

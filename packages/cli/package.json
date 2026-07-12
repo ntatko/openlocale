@@ -1,0 +1,36 @@
+{
+  "name": "@openlocale/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Push and pull translation files to/from an openlocale server",
+  "bin": {
+    "openlocale": "./dist/cli.js"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openlocale/formats": "workspace:*",
+    "commander": "^14.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

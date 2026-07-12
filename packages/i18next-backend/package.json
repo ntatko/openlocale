@@ -1,0 +1,36 @@
+{
+  "name": "@openlocale/i18next-backend",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "i18next backend plugin for openlocale with live translation updates",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --sourcemap",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@openlocale/sdk": "workspace:*"
+  },
+  "peerDependencies": {
+    "i18next": ">=21"
+  },
+  "devDependencies": {
+    "i18next": "^25.3.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
