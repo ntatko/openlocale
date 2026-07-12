@@ -1,0 +1,31 @@
+{
+  "name": "@openlocale/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema/sqlite": "./src/schema/sqlite.ts",
+    "./schema/pg": "./src/schema/pg.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate --config drizzle.config.sqlite.ts && drizzle-kit generate --config drizzle.config.pg.ts",
+    "db:migrate": "tsx src/migrate-cli.ts"
+  },
+  "dependencies": {
+    "@openlocale/shared": "workspace:*",
+    "better-sqlite3": "^12.2.0",
+    "drizzle-orm": "^0.44.2",
+    "postgres": "^3.4.7",
+    "ulid": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
