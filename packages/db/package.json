@@ -15,6 +15,7 @@
     "db:migrate": "tsx src/migrate-cli.ts"
   },
   "dependencies": {
+    "@openlocale/dedupe": "workspace:*",
     "@openlocale/shared": "workspace:*",
     "better-sqlite3": "^12.2.0",
     "drizzle-orm": "^0.44.2",

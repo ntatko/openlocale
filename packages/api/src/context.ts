@@ -1,20 +1,22 @@
-import { createDb, runMigrations, type DbHandle } from "@openlocale/db";
+import {
+  createDb,
+  createEventBus,
+  runMigrations,
+  type DbHandle,
+  type EventBus
+} from "@openlocale/db";
 import { createAuth, type Auth } from "./auth.js";
 
 export type AppContext = {
   handle: DbHandle;
   auth: Auth;
+  bus: EventBus;
 };
 
 let defaultContext: Promise<AppContext> | null = null;
 
 export function getDefaultContext(): Promise<AppContext> {
-  defaultContext ??= (async () => {
-    const handle = createDb();
-    await runMigrations(handle);
-    const auth = createAuth(handle);
-    return { handle, auth };
-  })();
+  defaultContext ??= createContext();
   return defaultContext;
 }
 
@@ -23,5 +25,6 @@ export async function createContext(opts?: { dbUrl?: string }): Promise<AppConte
   const handle = createDb({ url: opts?.dbUrl });
   await runMigrations(handle);
   const auth = createAuth(handle);
-  return { handle, auth };
+  const bus = createEventBus();
+  return { handle, auth, bus };
 }

@@ -85,6 +85,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@openlocale/dedupe':
+        specifier: workspace:*
+        version: link:../dedupe
       '@openlocale/shared':
         specifier: workspace:*
         version: link:../shared
@@ -110,6 +113,15 @@ importers:
       tsx:
         specifier: ^4.20.3
         version: 4.23.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)
+
+  packages/dedupe:
+    devDependencies:
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
