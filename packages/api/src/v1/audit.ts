@@ -2,7 +2,7 @@ import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
 import { repos } from "@openlocale/db";
 import type { ApiEnv } from "../app.js";
-import { requireProject } from "./helpers.js";
+import { requireProjectAccess } from "./helpers.js";
 
 const auditEventResponse = z.object({
   id: z.string(),
@@ -38,7 +38,7 @@ export function registerAuditRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project } = await requireProject(c, projectSlug, "project.read");
+      const { project } = await requireProjectAccess(c, projectSlug, "project.read");
       const { handle } = c.get("ctx");
       const q = c.req.valid("query");
       const events = await repos.audit.listForProject(handle, project.id, q);

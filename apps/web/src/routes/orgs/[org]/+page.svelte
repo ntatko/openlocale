@@ -9,9 +9,14 @@
 
 <div class="head">
 	<h1>{data.org.name}</h1>
-	{#if data.canCreateProject}
-		<button onclick={() => (showCreate = !showCreate)}>New project</button>
-	{/if}
+	<span class="head-actions">
+		{#if data.canManageOrg}
+			<a class="btn secondary" href={`/orgs/${data.org.slug}/tokens`}>API tokens</a>
+		{/if}
+		{#if data.canCreateProject}
+			<button onclick={() => (showCreate = !showCreate)}>New project</button>
+		{/if}
+	</span>
 </div>
 
 {#if showCreate}

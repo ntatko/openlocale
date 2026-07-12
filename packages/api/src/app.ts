@@ -1,6 +1,6 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { Scalar } from "@scalar/hono-api-reference";
-import type { User } from "@openlocale/db";
+import { repos, type ApiToken, type User } from "@openlocale/db";
 import type { AppContext } from "./context.js";
 import { getDefaultContext } from "./context.js";
 import { registerV1 } from "./v1/index.js";
@@ -9,6 +9,7 @@ export type ApiEnv = {
   Variables: {
     ctx: AppContext;
     user: User | null;
+    token: ApiToken | null;
   };
 };
 
@@ -52,12 +53,23 @@ export function createApp(getCtx: () => Promise<AppContext>) {
   // Better Auth (cookie sessions, /api/auth/*)
   app.on(["GET", "POST"], "/auth/*", (c) => c.get("ctx").auth.handler(c.req.raw));
 
-  // Resolve the cookie session for everything under /v1
+  // Resolve auth for everything under /v1: bearer API token first, else cookie session
   app.use("/v1/*", async (c, next) => {
-    const session = await c
-      .get("ctx")
-      .auth.api.getSession({ headers: c.req.raw.headers });
-    c.set("user", (session?.user as User | undefined) ?? null);
+    c.set("user", null);
+    c.set("token", null);
+    const authz = c.req.header("authorization");
+    if (authz?.startsWith("Bearer ")) {
+      const token = await repos.tokens.resolve(c.get("ctx").handle, authz.slice(7));
+      if (!token) {
+        return c.json({ error: { code: "INVALID_TOKEN", message: "invalid or revoked token" } }, 401);
+      }
+      c.set("token", token);
+    } else {
+      const session = await c
+        .get("ctx")
+        .auth.api.getSession({ headers: c.req.raw.headers });
+      c.set("user", (session?.user as User | undefined) ?? null);
+    }
     await next();
   });
 

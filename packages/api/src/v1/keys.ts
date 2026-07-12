@@ -3,7 +3,7 @@ import type { OpenAPIHono } from "@hono/zod-openapi";
 import { repos } from "@openlocale/db";
 import { keyCreateSchema, localeSchema, translationUpsertSchema } from "@openlocale/shared";
 import { ApiError, type ApiEnv } from "../app.js";
-import { requireProject } from "./helpers.js";
+import { requireProjectAccess } from "./helpers.js";
 
 const keyResponse = z.object({
   id: z.string(),
@@ -62,7 +62,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project } = await requireProject(c, projectSlug, "project.read");
+      const { project } = await requireProjectAccess(c, projectSlug, "project.read");
       const { handle } = c.get("ctx");
       const q = c.req.valid("query");
       const { keys, total } = await repos.keys.listWithTranslations(handle, {
@@ -116,7 +116,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project, org, user } = await requireProject(c, projectSlug, "keys.manage");
+      const { project, org, actor } = await requireProjectAccess(c, projectSlug, "keys.manage");
       const { handle } = c.get("ctx");
       const input = c.req.valid("json");
       const existing = await repos.keys.byName(handle, project.id, input.namespace, input.name);
@@ -129,7 +129,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
         namespace: input.namespace,
         name: input.name,
         context: input.context,
-        actor: { id: user.id, type: "user" }
+        actor
       });
       return c.json({ id: key.id, namespace: key.namespace, name: key.name }, 201);
     }
@@ -151,7 +151,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug, keyId } = c.req.valid("param");
-      const { project, org, user } = await requireProject(c, projectSlug, "keys.manage");
+      const { project, org, actor } = await requireProjectAccess(c, projectSlug, "keys.manage");
       const { handle } = c.get("ctx");
       const key = await repos.keys.byId(handle, keyId);
       if (!key || key.projectId !== project.id) {
@@ -162,7 +162,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
         projectId: project.id,
         orgId: org.id,
         archived: c.req.valid("json").archived,
-        actor: { id: user.id, type: "user" }
+        actor
       });
       return c.json({ ok: true }, 200);
     }
@@ -188,7 +188,11 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug, keyId, locale } = c.req.valid("param");
-      const { project, org, user } = await requireProject(c, projectSlug, "translations.edit");
+      const { project, org, actor, source } = await requireProjectAccess(
+        c,
+        projectSlug,
+        "translations.edit"
+      );
       const { handle, bus } = c.get("ctx");
       const key = await repos.keys.byId(handle, keyId);
       if (!key || key.projectId !== project.id) {
@@ -205,8 +209,8 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
           locale,
           value: input.value,
           status: input.status,
-          source: "ui",
-          actor: { id: user.id, type: "user" }
+          source,
+          actor
         },
         bus
       );
@@ -243,7 +247,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug, keyId, locale } = c.req.valid("param");
-      const { project } = await requireProject(c, projectSlug, "project.read");
+      const { project } = await requireProjectAccess(c, projectSlug, "project.read");
       const { handle } = c.get("ctx");
       const key = await repos.keys.byId(handle, keyId);
       if (!key || key.projectId !== project.id) {
@@ -285,7 +289,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug, keyId, locale } = c.req.valid("param");
-      const { project, org, user } = await requireProject(c, projectSlug, "translations.edit");
+      const { project, org, actor } = await requireProjectAccess(c, projectSlug, "translations.edit");
       const { handle, bus } = c.get("ctx");
       const result = await repos.translations.rollback(
         handle,
@@ -296,7 +300,7 @@ export function registerKeyRoutes(app: OpenAPIHono<ApiEnv>) {
           orgId: org.id,
           locale,
           versionId: c.req.valid("json").versionId,
-          actor: { id: user.id, type: "user" }
+          actor
         },
         bus
       );

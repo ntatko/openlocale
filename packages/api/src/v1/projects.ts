@@ -3,7 +3,7 @@ import type { OpenAPIHono } from "@hono/zod-openapi";
 import { repos } from "@openlocale/db";
 import { localeSchema, projectCreateSchema, projectUpdateSchema } from "@openlocale/shared";
 import { ApiError, type ApiEnv } from "../app.js";
-import { requireOrg, requireProject } from "./helpers.js";
+import { requireOrg, requireProjectAccess } from "./helpers.js";
 
 const projectResponse = z.object({
   id: z.string(),
@@ -116,7 +116,7 @@ export function registerProjectRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project } = await requireProject(c, projectSlug, "project.read");
+      const { project } = await requireProjectAccess(c, projectSlug, "project.read");
       return c.json(toProjectResponse(project), 200);
     }
   );
@@ -140,13 +140,13 @@ export function registerProjectRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project, user } = await requireProject(c, projectSlug, "project.manage");
+      const { project, actor } = await requireProjectAccess(c, projectSlug, "project.manage");
       const { handle } = c.get("ctx");
       const patch = c.req.valid("json");
       const updated = await repos.projects.update(handle, {
         projectId: project.id,
         patch,
-        actor: { id: user.id, type: "user" }
+        actor
       });
       return c.json(toProjectResponse(updated!), 200);
     }
@@ -168,7 +168,7 @@ export function registerProjectRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project } = await requireProject(c, projectSlug, "project.read");
+      const { project } = await requireProjectAccess(c, projectSlug, "project.read");
       const { handle } = c.get("ctx");
       const locales = await repos.projects.listLocales(handle, project.id);
       return c.json(
@@ -196,14 +196,14 @@ export function registerProjectRoutes(app: OpenAPIHono<ApiEnv>) {
     }),
     async (c) => {
       const { projectSlug } = c.req.valid("param");
-      const { project, org, user } = await requireProject(c, projectSlug, "project.manage");
+      const { project, org, actor } = await requireProjectAccess(c, projectSlug, "project.manage");
       const { handle } = c.get("ctx");
       const { locale } = c.req.valid("json");
       await repos.projects.addLocale(handle, {
         projectId: project.id,
         orgId: org.id,
         locale,
-        actor: { id: user.id, type: "user" }
+        actor
       });
       return c.body(null, 201);
     }

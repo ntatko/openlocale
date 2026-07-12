@@ -15,6 +15,7 @@ export const load: PageServerLoad = async ({ locals, params }) => {
 		org: { id: org.id, name: org.name, slug: org.slug },
 		role,
 		canCreateProject: canOrg(role as OrgRole, "project.create"),
+		canManageOrg: canOrg(role as OrgRole, "org.manage"),
 		projects: projects.map((p) => ({
 			id: p.id,
 			name: p.name,
