@@ -6,6 +6,27 @@
 	let password = $state('');
 	let error = $state<string | null>(null);
 	let busy = $state(false);
+	let ssoMode = $state(false);
+	let ssoError = $state<string | null>(null);
+
+	async function ssoSubmit(e: SubmitEvent) {
+		e.preventDefault();
+		busy = true;
+		ssoError = null;
+		const res = await fetch('/api/v1/sso/start', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ email, callbackURL: '/' })
+		});
+		busy = false;
+		if (!res.ok) {
+			const body = await res.json().catch(() => null);
+			ssoError = body?.error?.message ?? 'SSO is not configured for this email domain';
+			return;
+		}
+		const { url } = await res.json();
+		window.location.href = url;
+	}
 
 	async function submit(e: SubmitEvent) {
 		e.preventDefault();
@@ -24,30 +45,59 @@
 
 <div class="auth card">
 	<h1>Sign in</h1>
-	<form onsubmit={submit}>
-		<div class="field">
-			<label for="email">Email</label>
-			<input id="email" type="email" bind:value={email} required autocomplete="email" />
-		</div>
-		<div class="field">
-			<label for="password">Password</label>
-			<input
-				id="password"
-				type="password"
-				bind:value={password}
-				required
-				autocomplete="current-password"
-			/>
-		</div>
-		{#if error}<p class="error">{error}</p>{/if}
-		<button type="submit" disabled={busy}>Sign in</button>
-	</form>
-	<p class="muted">No account? <a href="/signup">Sign up</a></p>
+	{#if ssoMode}
+		<form onsubmit={ssoSubmit}>
+			<div class="field">
+				<label for="sso-email">Work email</label>
+				<input id="sso-email" type="email" bind:value={email} required autocomplete="email" />
+			</div>
+			{#if ssoError}<p class="error">{ssoError}</p>{/if}
+			<button type="submit" disabled={busy}>Continue with SSO</button>
+		</form>
+		<p class="muted">
+			<button class="linklike" onclick={() => (ssoMode = false)}>Use password instead</button>
+		</p>
+	{:else}
+		<form onsubmit={submit}>
+			<div class="field">
+				<label for="email">Email</label>
+				<input id="email" type="email" bind:value={email} required autocomplete="email" />
+			</div>
+			<div class="field">
+				<label for="password">Password</label>
+				<input
+					id="password"
+					type="password"
+					bind:value={password}
+					required
+					autocomplete="current-password"
+				/>
+			</div>
+			{#if error}<p class="error">{error}</p>{/if}
+			<button type="submit" disabled={busy}>Sign in</button>
+		</form>
+		<p class="muted">
+			<button class="linklike" onclick={() => (ssoMode = true)}>Continue with SSO</button>
+			· No account? <a href="/signup">Sign up</a>
+		</p>
+	{/if}
 </div>
 
 <style>
 	.auth {
 		max-width: 380px;
 		margin: 60px auto;
+	}
+	.linklike {
+		background: none;
+		border: none;
+		padding: 0;
+		color: var(--accent);
+		cursor: pointer;
+		font-size: inherit;
+	}
+	.linklike:hover {
+		background: none;
+		color: var(--accent-hover);
 	}
 </style>

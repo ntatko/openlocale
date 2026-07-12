@@ -81,6 +81,19 @@ export const verification = pgTable("verification", {
   updatedAt: updatedAt()
 });
 
+// @better-auth/sso plugin table (per-org OIDC/SAML providers)
+export const ssoProvider = pgTable("sso_provider", {
+  id: id(),
+  issuer: text("issuer").notNull(),
+  oidcConfig: text("oidc_config"),
+  samlConfig: text("saml_config"),
+  userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+  providerId: text("provider_id").notNull().unique(),
+  organizationId: text("organization_id"),
+  domain: text("domain").notNull(),
+  domainVerified: bool("domain_verified")
+});
+
 // ---------------------------------------------------------------------------
 // openlocale tables
 // ---------------------------------------------------------------------------
@@ -116,7 +129,6 @@ export const orgConnectors = pgTable("org_connectors", {
   providerId: text("provider_id").notNull().unique(),
   issuer: text("issuer").notNull(),
   clientId: text("client_id").notNull(),
-  clientSecretEnc: text("client_secret_enc").notNull(),
   emailDomain: text("email_domain").notNull(),
   enabled: bool("enabled").notNull(),
   createdAt: createdAt()

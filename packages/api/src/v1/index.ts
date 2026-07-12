@@ -7,6 +7,7 @@ import { registerAuditRoutes } from "./audit.js";
 import { registerTokenRoutes } from "./tokens.js";
 import { registerIoRoutes } from "./io.js";
 import { registerCdnRoutes } from "./cdn.js";
+import { registerSsoRoutes } from "./sso.js";
 
 export function registerV1(app: OpenAPIHono<ApiEnv>) {
   registerOrgRoutes(app);
@@ -16,4 +17,5 @@ export function registerV1(app: OpenAPIHono<ApiEnv>) {
   registerTokenRoutes(app);
   registerIoRoutes(app);
   registerCdnRoutes(app);
+  registerSsoRoutes(app);
 }

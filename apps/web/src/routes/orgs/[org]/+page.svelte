@@ -13,6 +13,9 @@
 		{#if data.canManageOrg}
 			<a class="btn secondary" href={`/orgs/${data.org.slug}/tokens`}>API tokens</a>
 		{/if}
+		{#if data.canManageConnectors}
+			<a class="btn secondary" href={`/orgs/${data.org.slug}/connectors`}>SSO</a>
+		{/if}
 		{#if data.canCreateProject}
 			<button onclick={() => (showCreate = !showCreate)}>New project</button>
 		{/if}

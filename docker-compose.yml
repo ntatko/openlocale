@@ -15,5 +15,18 @@ services:
       timeout: 3s
       retries: 10
 
+  # Local OIDC identity provider for testing SSO connectors:
+  #   docker compose up -d dex
+  # then register a connector with issuer http://localhost:5556/dex,
+  # client id "openlocale", secret "openlocale-secret", domain "example.com";
+  # log in as admin@example.com / password
+  dex:
+    image: dexidp/dex:v2.41.1
+    command: ["dex", "serve", "/etc/dex/config.yaml"]
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dev/dex-config.yaml:/etc/dex/config.yaml:ro
+
 volumes:
   pgdata:

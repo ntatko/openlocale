@@ -8,6 +8,20 @@
       "when": 1783753380213,
       "tag": "0000_modern_katie_power",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1783874509724,
+      "tag": "0001_rare_scarlet_spider",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1783875222577,
+      "tag": "0002_powerful_hellfire_club",
+      "breakpoints": true
     }
   ]
 }

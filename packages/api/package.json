@@ -11,6 +11,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/sso": "^1.6.23",
     "@hono/zod-openapi": "^1.1.0",
     "@openlocale/db": "workspace:*",
     "@openlocale/formats": "workspace:*",

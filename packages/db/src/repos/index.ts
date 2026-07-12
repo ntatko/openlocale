@@ -7,4 +7,5 @@ export * as tokens from "./tokens.js";
 export * as imports from "./imports.js";
 export * as aliases from "./aliases.js";
 export * as dedupe from "./dedupe.js";
+export * as connectors from "./connectors.js";
 export * as translations from "./translations.js";
