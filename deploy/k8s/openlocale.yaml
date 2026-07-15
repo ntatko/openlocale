@@ -1,0 +1,114 @@
+# openlocale on Kubernetes (tested against k3s).
+#
+#   kubectl create namespace openlocale
+#   kubectl -n openlocale create secret generic openlocale \
+#     --from-literal=OPENLOCALE_AUTH_SECRET=$(openssl rand -hex 32)
+#   kubectl -n openlocale apply -f openlocale.yaml
+#
+# Adjust the image, host, and OPENLOCALE_BASE_URL below. SQLite lives on the
+# PVC; keep replicas at 1 and strategy Recreate (single writer, RWO volume).
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openlocale-data
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 2Gi
+  # k3s: omit storageClassName to use the default local-path provisioner
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openlocale
+  labels:
+    app: openlocale
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # RWO volume + SQLite: never run two writers
+  selector:
+    matchLabels:
+      app: openlocale
+  template:
+    metadata:
+      labels:
+        app: openlocale
+    spec:
+      containers:
+        - name: openlocale
+          image: openlocale/openlocale:latest # ← your Docker Hub image
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: OPENLOCALE_BASE_URL
+              value: https://locale.example.com # ← public URL
+            - name: OPENLOCALE_DB_URL
+              value: file:/data/openlocale.db
+            - name: OPENLOCALE_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: openlocale
+                  key: OPENLOCALE_AUTH_SECRET
+            # optional extras — see the environment reference in the docs:
+            # - name: ANTHROPIC_API_KEY
+            #   valueFrom: { secretKeyRef: { name: openlocale, key: ANTHROPIC_API_KEY } }
+            # - name: OPENLOCALE_TRUSTED_ORIGINS
+            #   value: https://idp.internal.example
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet: { path: /api/health, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /api/health, port: http }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 768Mi }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: openlocale-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openlocale
+spec:
+  selector:
+    app: openlocale
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openlocale
+  annotations:
+    # k3s ships Traefik; SSE passes through unbuffered by default.
+    # For TLS via cert-manager, add:
+    #   cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  rules:
+    - host: locale.example.com # ← your host
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: openlocale
+                port:
+                  name: http
+  # tls:
+  #   - hosts: [locale.example.com]
+  #     secretName: openlocale-tls

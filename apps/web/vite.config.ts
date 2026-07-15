@@ -5,6 +5,11 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	// 5173 collides with podman's gvproxy on some machines
 	server: { port: 5199 },
+	ssr: {
+		// native/driver modules must stay external — bundling better-sqlite3's
+		// CJS loader into ESM breaks (`__filename is not defined`)
+		external: ['better-sqlite3', 'postgres']
+	},
 	plugins: [
 		sveltekit({
 			compilerOptions: {

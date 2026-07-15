@@ -7,17 +7,20 @@ to operate.
 ## Docker (recommended)
 
 ```sh
-docker build -t openlocale .
 docker run -d --name openlocale \
   -p 3000:3000 \
   -v openlocale-data:/data \
-  -e OPENLOCALE_DB_URL=file:/data/openlocale.db \
   -e OPENLOCALE_AUTH_SECRET=$(openssl rand -hex 32) \
   -e OPENLOCALE_BASE_URL=https://locale.example.com \
-  openlocale
+  openlocale/openlocale:latest
 ```
 
-Database migrations run automatically on boot. That's the whole deployment.
+The image defaults SQLite to `/data/openlocale.db`, so the mounted volume is
+the only persistence requirement. Database migrations run automatically on
+boot. That's the whole deployment. (Building your own image is just
+`docker build -t openlocale .` in the repo.)
+
+Running Kubernetes? See [Deploying on Kubernetes](/guide/kubernetes).
 
 ::: warning Set the secret and base URL
 `OPENLOCALE_AUTH_SECRET` signs sessions — the server refuses to start in

@@ -60,6 +60,10 @@ export function createAuth(handle: DbHandle) {
       database: {
         // our schema uses app-generated ULIDs everywhere
         generateId: () => newId()
+      },
+      // self-hosted deployments sit behind a reverse proxy/ingress
+      ipAddress: {
+        ipAddressHeaders: ["x-forwarded-for", "x-real-ip"]
       }
     }
   });
