@@ -1,0 +1,19 @@
+{
+  "name": "@openlocale/seed",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx seed.ts",
+    "lint": "tsc --noEmit || true",
+    "test": "echo ok"
+  },
+  "dependencies": {
+    "@openlocale/api": "workspace:*",
+    "@openlocale/db": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

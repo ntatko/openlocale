@@ -33,6 +33,9 @@ importers:
         specifier: ^1.3.4
         version: 1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.61.1
+        version: 1.61.1
       '@sveltejs/adapter-node':
         specifier: ^5.2.12
         version: 5.5.7(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))
@@ -75,7 +78,7 @@ importers:
     dependencies:
       '@better-auth/sso':
         specifier: ^1.6.23
-        version: 1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-call@1.3.7(zod@4.4.3))
+        version: 1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-call@1.3.7(zod@4.4.3))
       '@hono/zod-openapi':
         specifier: ^1.1.0
         version: 1.4.0(hono@4.12.29)(zod@4.4.3)
@@ -102,7 +105,7 @@ importers:
         version: 0.9.48(hono@4.12.29)
       better-auth:
         specifier: ^1.3.4
-        version: 1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
+        version: 1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
       hono:
         specifier: ^4.8.3
         version: 4.12.29
@@ -284,6 +287,22 @@ importers:
         version: 3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)
 
   tools/license-keygen: {}
+
+  tools/seed:
+    dependencies:
+      '@openlocale/api':
+        specifier: workspace:*
+        version: link:../../packages/api
+      '@openlocale/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+    devDependencies:
+      tsx:
+        specifier: ^4.20.3
+        version: 4.23.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
 
 packages:
 
@@ -1069,6 +1088,11 @@ packages:
 
   '@oxc-project/types@0.139.0':
     resolution: {integrity: sha512-r9gHphtCs+1M7J0pw6Sn/hh/Wpa/iQrOOkrNAlVLF/gHq+/CJmHIWKKUUhdWjcD6CIa8idarspCsASiXCXvFUw==}
+
+  '@playwright/test@1.61.1':
+    resolution: {integrity: sha512-8nKv6+0RJSL9FE4jYOEGXnPeM/Hg12qZpmqzZjRh3qM0Y7c3z1mrOTfFLids72RDQYVh9WpLEfR5WdpNX4fkig==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
@@ -1898,6 +1922,11 @@ packages:
   fs-constants@1.0.0:
     resolution: {integrity: sha512-y6OAwoSIf7FyjMIv94u+b5rdheZEjzR63GTyZJm5qh4Bi+2YgwLCcI/fPFZkL5PSixOt6ZNKm+w+Hfp/Bciwow==}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -2168,6 +2197,16 @@ packages:
 
   pkg-types@1.3.1:
     resolution: {integrity: sha512-/Jm5M4RvtBFVkKWRu2BLUTNP8/M2a+UwuAX+ae4770q1qVGtfjG+WTCupoZixokjmHiry8uI+dlY8KXYV5HVVQ==}
+
+  playwright-core@1.61.1:
+    resolution: {integrity: sha512-h7Qlt6m4REp25qvIdvbDtVmD4LqVXfpRxhORv9L0jzETM05p4fuPJ3dKyuSXQxDSbXnmS79HAgi9589lGSpLkg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.61.1:
+    resolution: {integrity: sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   postcss-load-config@6.0.1:
     resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
@@ -2689,12 +2728,12 @@ snapshots:
       '@better-auth/core': 1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0)
       '@better-auth/utils': 0.4.2
 
-  '@better-auth/sso@1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-call@1.3.7(zod@4.4.3))':
+  '@better-auth/sso@1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0))(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-auth@1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-call@1.3.7(zod@4.4.3))':
     dependencies:
       '@better-auth/core': 1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0)
       '@better-auth/utils': 0.4.2
       '@better-fetch/fetch': 1.3.1
-      better-auth: 1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
+      better-auth: 1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
       better-call: 1.3.7(zod@4.4.3)
       fast-xml-parser: 5.10.0
       jose: 6.2.3
@@ -3091,6 +3130,10 @@ snapshots:
 
   '@oxc-project/types@0.139.0': {}
 
+  '@playwright/test@1.61.1':
+    dependencies:
+      playwright: 1.61.1
+
   '@polka/url@1.0.0-next.29': {}
 
   '@rolldown/binding-android-arm64@1.1.5':
@@ -3295,11 +3338,11 @@ snapshots:
       '@sveltejs/kit': 2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@6.0.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))
       rollup: 4.62.2
 
-  '@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))':
+  '@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@sveltejs/acorn-typescript': 1.0.11(acorn@8.17.0)
-      '@sveltejs/vite-plugin-svelte': 7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
+      '@sveltejs/vite-plugin-svelte': 7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))
       '@types/cookie': 0.6.0
       acorn: 8.17.0
       cookie: 0.6.0
@@ -3311,7 +3354,7 @@ snapshots:
       set-cookie-parser: 3.1.2
       sirv: 3.0.2
       svelte: 5.56.4
-      vite: 7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)
+      vite: 8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)
     optionalDependencies:
       typescript: 5.9.3
     optional: true
@@ -3337,16 +3380,6 @@ snapshots:
       typescript: 6.0.3
 
   '@sveltejs/load-config@0.2.0': {}
-
-  '@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))':
-    dependencies:
-      deepmerge: 4.3.1
-      magic-string: 0.30.21
-      obug: 2.1.3
-      svelte: 5.56.4
-      vite: 7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)
-      vitefu: 1.1.3(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
-    optional: true
 
   '@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))':
     dependencies:
@@ -3484,7 +3517,7 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  better-auth@1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)):
+  better-auth@1.6.23(@sveltejs/kit@2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(better-sqlite3@12.11.1)(drizzle-kit@0.31.10)(svelte@5.56.4)(vitest@3.2.7(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)):
     dependencies:
       '@better-auth/core': 1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0)
       '@better-auth/drizzle-adapter': 1.6.23(@better-auth/core@1.6.23(@better-auth/utils@0.4.2)(@better-fetch/fetch@1.3.1)(better-call@1.3.7(zod@4.4.3))(jose@6.2.3)(kysely@0.29.3)(nanostores@1.4.0))(@better-auth/utils@0.4.2)
@@ -3504,7 +3537,7 @@ snapshots:
       nanostores: 1.4.0
       zod: 4.4.3
     optionalDependencies:
-      '@sveltejs/kit': 2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0))
+      '@sveltejs/kit': 2.69.2(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0))
       better-sqlite3: 12.11.1
       drizzle-kit: 0.31.10
       svelte: 5.56.4
@@ -3825,6 +3858,9 @@ snapshots:
 
   fs-constants@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -4033,6 +4069,14 @@ snapshots:
       confbox: 0.1.8
       mlly: 1.8.2
       pathe: 2.0.3
+
+  playwright-core@1.61.1: {}
+
+  playwright@1.61.1:
+    dependencies:
+      playwright-core: 1.61.1
+    optionalDependencies:
+      fsevents: 2.3.2
 
   postcss-load-config@6.0.1(postcss@8.5.16)(tsx@4.23.0)(yaml@2.9.0):
     dependencies:
@@ -4442,11 +4486,6 @@ snapshots:
       fsevents: 2.3.3
       tsx: 4.23.0
       yaml: 2.9.0
-
-  vitefu@1.1.3(vite@7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)):
-    optionalDependencies:
-      vite: 7.3.6(@types/node@26.1.1)(lightningcss@1.32.0)(tsx@4.23.0)(yaml@2.9.0)
-    optional: true
 
   vitefu@1.1.3(vite@8.1.4(@types/node@26.1.1)(esbuild@0.28.1)(tsx@4.23.0)(yaml@2.9.0)):
     optionalDependencies:

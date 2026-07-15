@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import type { DbHandle } from "../client.js";
 import { newId } from "../ids.js";
 import { withTx } from "../tx.js";
@@ -122,10 +122,19 @@ export async function memberRole(
 
 export async function listLocales(handle: DbHandle, projectId: string) {
   const t = tables(handle);
-  return dbOf(handle)
+  const rows = await dbOf(handle)
     .select()
     .from(t.projectLocales)
-    .where(eq(t.projectLocales.projectId, projectId));
+    .where(eq(t.projectLocales.projectId, projectId))
+    .orderBy(asc(t.projectLocales.locale));
+  // source locale first — editors and exports expect it as the anchor column
+  const project = await byId(handle, projectId);
+  if (project) {
+    rows.sort((a, b) =>
+      a.locale === project.sourceLocale ? -1 : b.locale === project.sourceLocale ? 1 : 0
+    );
+  }
+  return rows;
 }
 
 export async function addLocale(

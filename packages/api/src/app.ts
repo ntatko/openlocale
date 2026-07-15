@@ -3,6 +3,7 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { repos, type ApiToken, type User } from "@openlocale/db";
 import type { AppContext } from "./context.js";
 import { getDefaultContext } from "./context.js";
+import { rateLimit } from "./rate-limit.js";
 import { registerV1 } from "./v1/index.js";
 
 export type ApiEnv = {
@@ -52,6 +53,9 @@ export function createApp(getCtx: () => Promise<AppContext>) {
 
   // Better Auth (cookie sessions, /api/auth/*)
   app.on(["GET", "POST"], "/auth/*", (c) => c.get("ctx").auth.handler(c.req.raw));
+
+  // public delivery endpoints get a per-IP backstop rate limit
+  app.use("/v1/cdn/*", rateLimit());
 
   // Resolve auth for everything under /v1: bearer API token first, else cookie session
   app.use("/v1/*", async (c, next) => {
