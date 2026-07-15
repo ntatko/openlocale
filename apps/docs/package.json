@@ -1,0 +1,16 @@
+{
+  "name": "docs",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev --port 5177",
+    "build": "vitepress build",
+    "preview": "vitepress preview --port 5177",
+    "lint": "echo ok",
+    "test": "echo ok"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}

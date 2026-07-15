@@ -1,0 +1,25 @@
+:root {
+	--vp-c-brand-1: #3d7dff;
+	--vp-c-brand-2: #4f8cff;
+	--vp-c-brand-3: #4f8cff;
+	--vp-c-brand-soft: rgba(79, 140, 255, 0.14);
+
+	--vp-home-hero-name-color: transparent;
+	--vp-home-hero-name-background: linear-gradient(120deg, #4f8cff 30%, #3fcf8e);
+	--vp-home-hero-image-background-image: linear-gradient(
+		-45deg,
+		rgba(79, 140, 255, 0.35) 40%,
+		rgba(63, 207, 142, 0.35) 60%
+	);
+	--vp-home-hero-image-filter: blur(56px);
+}
+
+.dark {
+	--vp-c-brand-1: #6ba0ff;
+	--vp-c-brand-2: #4f8cff;
+}
+
+/* landing page code window */
+.vp-doc div[class*='language-'] {
+	border-radius: 10px;
+}
