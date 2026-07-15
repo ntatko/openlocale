@@ -6,11 +6,13 @@ import {
   type EventBus
 } from "@openlocale/db";
 import { createAuth, type Auth } from "./auth.js";
+import { LicenseState } from "./license-state.js";
 
 export type AppContext = {
   handle: DbHandle;
   auth: Auth;
   bus: EventBus;
+  license: LicenseState;
 };
 
 let defaultContext: Promise<AppContext> | null = null;
@@ -26,5 +28,6 @@ export async function createContext(opts?: { dbUrl?: string }): Promise<AppConte
   await runMigrations(handle);
   const auth = createAuth(handle);
   const bus = createEventBus(handle);
-  return { handle, auth, bus };
+  const license = new LicenseState(handle);
+  return { handle, auth, bus, license };
 }

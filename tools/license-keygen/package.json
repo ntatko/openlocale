@@ -1,0 +1,13 @@
+{
+  "name": "@openlocale/license-keygen",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "openlocale-keygen": "./keygen.js"
+  },
+  "scripts": {
+    "lint": "echo ok",
+    "test": "echo ok"
+  }
+}

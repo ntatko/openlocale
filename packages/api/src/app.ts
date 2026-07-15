@@ -15,7 +15,7 @@ export type ApiEnv = {
 
 export class ApiError extends Error {
   constructor(
-    public status: 400 | 401 | 402 | 403 | 404 | 409 | 422 | 429,
+    public status: 400 | 401 | 402 | 403 | 404 | 409 | 422 | 429 | 503,
     public code: string,
     message: string
   ) {

@@ -1,10 +1,84 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import type { OpenAPIHono } from "@hono/zod-openapi";
-import { repos } from "@openlocale/db";
+import type { Context } from "hono";
+import { repos, type Project } from "@openlocale/db";
+import { buildIndex, findNearMiss } from "@openlocale/dedupe";
 import { getCodec, isFormatId, type FormatEntry } from "@openlocale/formats";
+import { getSemanticJudge } from "@openlocale/translate";
 import { localeSchema } from "@openlocale/shared";
 import { ApiError, type ApiEnv } from "../app.js";
 import { requireProjectAccess } from "./helpers.js";
+
+/**
+ * Licensed AI pass: fuzzy near-misses (0.6–0.85, below the automatic
+ * suggestion threshold) are judged by the MT provider for same-meaning; the
+ * confident yeses become "semantic" suggestions. Best-effort — provider
+ * errors never fail the import.
+ */
+async function semanticDedupePass(
+  c: Context<ApiEnv>,
+  project: Project,
+  jobId: string,
+  locale: string,
+  entries: { key: string; value: string }[]
+): Promise<void> {
+  const { handle, license } = c.get("ctx");
+  if (!(await license.allows("ai"))) return;
+  const judge = getSemanticJudge();
+  if (!judge) return;
+
+  try {
+    const existing = await repos.dedupe.listForJob(handle, jobId);
+    const alreadyFlagged = new Set(existing.map((s) => s.incomingKey));
+    const index = buildIndex(await repos.imports.dedupeCandidates(handle, project.id, locale));
+
+    const nearMisses: { key: string; value: string; keyId: string }[] = [];
+    for (const entry of entries) {
+      if (alreadyFlagged.has(entry.key)) continue;
+      const miss = findNearMiss(entry.value, index);
+      if (miss && miss.keyName !== entry.key) {
+        nearMisses.push({ key: entry.key, value: entry.value, keyId: miss.keyId });
+      }
+    }
+    if (nearMisses.length === 0) return;
+
+    const matchedValues = new Map<string, string>();
+    for (const c2 of index.fuzzy ?? []) matchedValues.set(c2.candidate.keyId, c2.candidate.value);
+
+    const verdicts = await judge.judge(
+      nearMisses.slice(0, 50).map((m) => ({
+        id: m.key,
+        incoming: m.value,
+        existing: matchedValues.get(m.keyId) ?? ""
+      })),
+      locale
+    );
+
+    const byKey = new Map(nearMisses.map((m) => [m.key, m]));
+    await repos.dedupe.addSuggestions(
+      handle,
+      verdicts
+        .filter((v) => v.sameMeaning && v.confidence >= 70)
+        .flatMap((v) => {
+          const miss = byKey.get(v.id);
+          if (!miss) return [];
+          return [
+            {
+              jobId,
+              projectId: project.id,
+              incomingKey: miss.key,
+              incomingValue: miss.value,
+              matchedKeyId: miss.keyId,
+              matchType: "semantic" as const,
+              score: Math.min(100, Math.max(0, Math.round(v.confidence)))
+            }
+          ];
+        })
+    );
+  } catch (err) {
+    console.error("openlocale: semantic dedupe pass failed (import continues)", err);
+  }
+}
 
 const formatParam = z.string().refine(isFormatId, { message: "unknown format" });
 
@@ -152,6 +226,8 @@ export function registerIoRoutes(app: OpenAPIHono<ApiEnv>) {
         })),
         actor
       });
+
+      await semanticDedupePass(c, project, job.id, locale, parsed.entries);
 
       return c.json(
         {

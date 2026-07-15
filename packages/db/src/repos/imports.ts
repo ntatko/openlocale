@@ -22,9 +22,9 @@ export type AnalyzeStats = {
 
 /**
  * Existing translations for the import's locale, joined with their key names,
- * as dedupe candidates.
+ * as dedupe candidates. Exported for the semantic (AI) dedupe pass.
  */
-async function dedupeCandidates(
+export async function dedupeCandidates(
   handle: DbHandle,
   projectId: string,
   locale: string

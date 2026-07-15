@@ -23,6 +23,7 @@
 		<a href="/" class="brand">open<span>locale</span></a>
 		<nav>
 			{#if data.user}
+				<a href="/settings" class="muted">Settings</a>
 				<span class="muted">{data.user.email}</span>
 				<button class="secondary" onclick={signOut}>Sign out</button>
 			{:else}

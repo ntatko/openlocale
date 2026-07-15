@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import type { DbHandle } from "../client.js";
+import { newId } from "../ids.js";
 import { withTx } from "../tx.js";
 import type { DedupeSuggestion } from "../types.js";
 import { dbOf, tables } from "./helpers.js";
@@ -10,6 +11,25 @@ export async function listForJob(handle: DbHandle, jobId: string): Promise<Dedup
     .select()
     .from(t.dedupeSuggestions)
     .where(eq(t.dedupeSuggestions.jobId, jobId));
+}
+
+export async function addSuggestions(
+  handle: DbHandle,
+  rows: {
+    jobId: string;
+    projectId: string;
+    incomingKey: string;
+    incomingValue: string;
+    matchedKeyId: string;
+    matchType: "exact" | "normalized" | "fuzzy" | "semantic";
+    score: number;
+  }[]
+): Promise<void> {
+  if (rows.length === 0) return;
+  const t = tables(handle);
+  await dbOf(handle)
+    .insert(t.dedupeSuggestions)
+    .values(rows.map((r) => ({ id: newId(), status: "pending" as const, ...r })));
 }
 
 export async function resolve(

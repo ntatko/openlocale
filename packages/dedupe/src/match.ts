@@ -43,6 +43,41 @@ function jaccard(a: Set<string>, b: Set<string>): number {
   return intersection / (a.size + b.size - intersection);
 }
 
+/**
+ * Best sub-threshold fuzzy candidate (default 0.6–0.85 band) — feed these to
+ * the licensed semantic judge, which decides if they truly mean the same.
+ */
+export function findNearMiss(
+  value: string,
+  index: DedupeIndex,
+  opts?: { min?: number; max?: number }
+): (Match & { matchType: "fuzzy" }) | null {
+  if (!index.fuzzy) return null;
+  const min = opts?.min ?? 0.6;
+  const max = opts?.max ?? 0.85;
+  const normalized = normalize(value);
+  const grams = trigrams(normalized);
+  const len = normalized.length;
+
+  let best: { candidate: Candidate; score: number } | null = null;
+  for (const entry of index.fuzzy) {
+    const otherLen = entry.normalized.length;
+    if (otherLen < len * 0.6 || otherLen > len * 1.67) continue;
+    const score = jaccard(grams, entry.grams);
+    if (score >= min && score < max && (!best || score > best.score)) {
+      best = { candidate: entry.candidate, score };
+    }
+  }
+  if (!best) return null;
+  return {
+    keyId: best.candidate.keyId,
+    keyName: best.candidate.keyName,
+    matchedValue: best.candidate.value,
+    matchType: "fuzzy",
+    score: Math.round(best.score * 100)
+  };
+}
+
 export type DedupeIndex = {
   byValueHash: Map<string, Candidate[]>;
   byNormalizedHash: Map<string, Candidate[]>;

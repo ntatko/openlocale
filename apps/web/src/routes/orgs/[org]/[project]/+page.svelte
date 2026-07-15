@@ -2,6 +2,7 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import TranslationCell from '$lib/components/TranslationCell.svelte';
 	import HistoryDrawer from '$lib/components/HistoryDrawer.svelte';
+	import AutoTranslatePanel from '$lib/components/AutoTranslatePanel.svelte';
 
 	let { data } = $props();
 
@@ -13,6 +14,7 @@
 	let newKeyError = $state<string | null>(null);
 	let newLocale = $state('');
 	let history = $state<{ keyId: string; keyName: string; locale: string } | null>(null);
+	let showAutoTranslate = $state(false);
 
 	async function submitSearch(e: SubmitEvent) {
 		e.preventDefault();
@@ -77,6 +79,15 @@
 			<input placeholder="Add locale (es, pt-BR…)" bind:value={newLocale} size="14" />
 			<button type="submit" class="secondary">Add locale</button>
 		</form>
+	{/if}
+	{#if data.perms.canEdit}
+		<button
+			class="secondary"
+			onclick={() => (showAutoTranslate = true)}
+			title={data.aiLicensed ? 'Machine-translate missing strings' : 'AI is a paid feature'}
+		>
+			{data.aiLicensed ? '✨ Auto-translate' : '🔒 Auto-translate'}
+		</button>
 	{/if}
 	{#if data.perms.canManageKeys}
 		<button onclick={() => (showNewKey = !showNewKey)}>New key</button>
@@ -154,6 +165,18 @@
 		</table>
 	</div>
 	<p class="muted">{data.total} key{data.total === 1 ? '' : 's'}</p>
+{/if}
+
+{#if showAutoTranslate}
+	<AutoTranslatePanel
+		projectSlug={data.project.slug}
+		sourceLocale={data.project.sourceLocale}
+		locales={data.locales.map((l) => l.locale)}
+		keys={data.keys}
+		aiLicensed={data.aiLicensed}
+		serverProvider={data.serverProvider}
+		onClose={() => (showAutoTranslate = false)}
+	/>
 {/if}
 
 {#if history}
