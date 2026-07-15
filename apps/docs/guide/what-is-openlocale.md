@@ -58,5 +58,6 @@ detection — are paid, unlocked by an offline-verified license key. See
 ## Next steps
 
 - [Getting started](/guide/getting-started) — running locally in two minutes
+- [Platform support](/guide/platforms) — what your stack uses: live SDKs, the HTTP API, or native file sync
 - [Self-hosting](/guide/self-hosting) — Docker, Postgres, reverse proxies
 - [Live delivery](/guide/live-delivery) — how the live loop works

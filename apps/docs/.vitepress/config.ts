@@ -32,6 +32,7 @@ export default defineConfig({
           text: "Introduction",
           items: [
             { text: "What is openlocale?", link: "/guide/what-is-openlocale" },
+            { text: "Platform support", link: "/guide/platforms" },
             { text: "Getting started", link: "/guide/getting-started" },
             { text: "Self-hosting", link: "/guide/self-hosting" },
             { text: "Deploying on Kubernetes", link: "/guide/kubernetes" }
