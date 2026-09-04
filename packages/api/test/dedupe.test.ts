@@ -27,7 +27,7 @@ beforeAll(async () => {
     headers: { "content-type": "application/json", cookie },
     body: JSON.stringify({ name: "cta.save" })
   });
-  const keyId = (await keyRes.json()).id;
+  const keyId = (await keyRes.json() as any).id;
   await app.request(`/api/v1/projects/${projectSlug}/keys/${keyId}/translations/en`, {
     method: "PUT",
     headers: { "content-type": "application/json", cookie },
@@ -49,7 +49,7 @@ async function importJson(payload: Record<string, string>) {
     headers: { cookie },
     body: form
   });
-  return res.json();
+  return res.json() as any;
 }
 
 describe("dedupe on import", () => {
@@ -63,7 +63,7 @@ describe("dedupe on import", () => {
     const res = await app.request(`/api/v1/imports/${job.id}/suggestions`, {
       headers: { cookie }
     });
-    const suggestions = await res.json();
+    const suggestions = await res.json() as any;
     expect(suggestions).toHaveLength(1);
     expect(suggestions[0]).toMatchObject({
       incomingKey: "button.save",
@@ -77,7 +77,7 @@ describe("dedupe on import", () => {
     const sugRes = await app.request(`/api/v1/imports/${job.id}/suggestions`, {
       headers: { cookie }
     });
-    const [suggestion] = await sugRes.json();
+    const [suggestion] = await sugRes.json() as any;
     expect(suggestion.matchType).toBe("exact");
 
     const resolve = await app.request(
@@ -99,11 +99,11 @@ describe("dedupe on import", () => {
     const keys = await app.request(`/api/v1/projects/${projectSlug}/keys?search=form.save`, {
       headers: { cookie }
     });
-    expect((await keys.json()).total).toBe(0);
+    expect((await keys.json() as any).total).toBe(0);
 
     // …but the alias resolves in the CDN bundle
     const bundle = await app.request(`/api/v1/cdn/${projectSlug}/en.json`);
-    const flat = await bundle.json();
+    const flat = await bundle.json() as any;
     expect(flat["form.save"]).toBe("Save changes");
     expect(flat["cta.save"]).toBe("Save changes");
 
@@ -120,7 +120,7 @@ describe("dedupe on import", () => {
     const job = await importJson({ "dialog.save": "Save changes" });
     const [suggestion] = await (
       await app.request(`/api/v1/imports/${job.id}/suggestions`, { headers: { cookie } })
-    ).json();
+    ).json() as any;
 
     await app.request(`/api/v1/imports/${job.id}/suggestions/${suggestion.id}`, {
       method: "POST",
@@ -135,14 +135,14 @@ describe("dedupe on import", () => {
     const keys = await app.request(`/api/v1/projects/${projectSlug}/keys?search=dialog.save`, {
       headers: { cookie }
     });
-    expect((await keys.json()).total).toBe(0); // merged, not created
+    expect((await keys.json() as any).total).toBe(0); // merged, not created
   });
 
   it("ignore resolution: key is created anyway", async () => {
     const job = await importJson({ "banner.save": "Save changes" });
     const [suggestion] = await (
       await app.request(`/api/v1/imports/${job.id}/suggestions`, { headers: { cookie } })
-    ).json();
+    ).json() as any;
 
     await app.request(`/api/v1/imports/${job.id}/suggestions/${suggestion.id}`, {
       method: "POST",
@@ -157,6 +157,6 @@ describe("dedupe on import", () => {
     const keys = await app.request(`/api/v1/projects/${projectSlug}/keys?search=banner.save`, {
       headers: { cookie }
     });
-    expect((await keys.json()).total).toBe(1);
+    expect((await keys.json() as any).total).toBe(1);
   });
 });

@@ -38,7 +38,7 @@ describe("OIDC connectors", () => {
       })
     });
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.emailDomain).toBe("corp.example");
     connectorId = body.id;
   });
@@ -48,7 +48,7 @@ describe("OIDC connectors", () => {
       headers: { cookie }
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toHaveLength(1);
+    expect(await res.json() as any).toHaveLength(1);
   });
 
   it("sso/start routes by email domain to the IdP authorization endpoint", async () => {
@@ -58,7 +58,7 @@ describe("OIDC connectors", () => {
       body: JSON.stringify({ email: "ada@corp.example" })
     });
     expect(res.status).toBe(200);
-    const { url } = await res.json();
+    const { url } = await res.json() as any;
     expect(url).toContain("https://idp.corp.example/auth");
     expect(url).toContain("client_id=openlocale-client");
     expect(url).toContain("code_challenge"); // PKCE

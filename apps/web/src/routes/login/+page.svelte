@@ -2,6 +2,11 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { authClient } from '$lib/authClient';
 
+	let { data } = $props();
+
+	const DEMO_EMAIL = 'admin@example.com';
+	const DEMO_PASSWORD = 'password1234';
+
 	let email = $state('');
 	let password = $state('');
 	let error = $state<string | null>(null);
@@ -28,6 +33,11 @@
 		window.location.href = url;
 	}
 
+	function fillDemoCredentials() {
+		email = DEMO_EMAIL;
+		password = DEMO_PASSWORD;
+	}
+
 	async function submit(e: SubmitEvent) {
 		e.preventDefault();
 		busy = true;
@@ -45,6 +55,18 @@
 
 <div class="auth card">
 	<h1>Sign in</h1>
+	{#if data.demoMode}
+		<div class="demo-banner">
+			<p>
+				This is a public demo — the database resets daily. Sign in with
+				<code>{DEMO_EMAIL}</code> / <code>{DEMO_PASSWORD}</code>, or <a href="/signup">sign up</a>
+				for your own throwaway account.
+			</p>
+			<button type="button" class="linklike" onclick={fillDemoCredentials}
+				>Fill in demo credentials</button
+			>
+		</div>
+	{/if}
 	{#if ssoMode}
 		<form onsubmit={ssoSubmit}>
 			<div class="field">
@@ -99,5 +121,19 @@
 	.linklike:hover {
 		background: none;
 		color: var(--accent-hover);
+	}
+	.demo-banner {
+		margin-bottom: 20px;
+		padding: 12px 14px;
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: var(--surface-2);
+		font-size: 0.9rem;
+	}
+	.demo-banner p {
+		margin: 0 0 8px;
+	}
+	.demo-banner code {
+		font-size: 0.85em;
 	}
 </style>

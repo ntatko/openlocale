@@ -19,7 +19,7 @@ afterAll(async () => {
 
 async function json(res: Response) {
   expect(res.headers.get("content-type")).toContain("json");
-  return res.json();
+  return res.json() as any;
 }
 
 describe("keys + translations API", () => {
