@@ -1,6 +1,7 @@
 {
   "name": "@openlocale/formats",
   "version": "0.1.0",
+  "private": true,
   "type": "module",
   "license": "MIT",
   "description": "Parsers and serializers for common i18n file formats (JSON, YAML, PO, XLIFF, CSV, .strings, Android XML, .properties, ARB)",

@@ -5,10 +5,11 @@ import { Command } from "commander";
 import { codecs, getCodec, guessFormat, isFormatId } from "@openlocale/formats";
 import { CONFIG_FILE, loadConfig } from "./config.js";
 import * as api from "./api.js";
+import pkg from "../package.json";
 
 const program = new Command("openlocale")
   .description("Push and pull translation files to/from an openlocale server")
-  .version("0.1.0");
+  .version(pkg.version);
 
 const globalOpts = (cmd: Command) =>
   cmd

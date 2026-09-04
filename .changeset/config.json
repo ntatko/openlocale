@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "privatePackages": { "version": true, "tag": false },
+  "fixed": [
+    [
+      "@openlocale/api",
+      "@openlocale/cli",
+      "@openlocale/db",
+      "@openlocale/dedupe",
+      "@openlocale/formats",
+      "@openlocale/i18next-backend",
+      "@openlocale/license",
+      "@openlocale/license-keygen",
+      "@openlocale/sdk",
+      "@openlocale/seed",
+      "@openlocale/shared",
+      "@openlocale/translate",
+      "web",
+      "docs"
+    ]
+  ],
+  "linked": [],
+  "ignore": ["i18next-demo"]
+}

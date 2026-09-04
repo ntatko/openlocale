@@ -1,0 +1,68 @@
+name: Release
+
+# Manually triggered. Bundles every pending changeset into one version bump
+# across all platform packages (locked together in .changeset/config.json's
+# "fixed" group — apps, packages, and tools all move in lockstep, so a
+# web-only or API-only change can still drive a release, not just changes to
+# the published npm packages), commits that bump straight to main, and tags
+# it. This workflow does not publish anything itself: the tag it pushes is
+# what triggers docker-publish.yml and npm-publish.yml, which do the actual
+# releasing. Run it manually (Actions tab -> Release -> Run workflow) when
+# you're ready to cut a release.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check for pending changesets
+        id: status
+        run: |
+          set -euo pipefail
+          COUNT=$(find .changeset -maxdepth 1 -name "*.md" ! -name "README.md" | wc -l)
+          echo "count=$COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Version
+        if: steps.status.outputs.count != '0'
+        run: pnpm exec changeset version
+
+      - name: Build and test the version bump
+        if: steps.status.outputs.count != '0'
+        run: |
+          pnpm build
+          pnpm test
+
+      - name: Read new version
+        if: steps.status.outputs.count != '0'
+        id: pkg
+        run: echo "version=$(node -p "require('./packages/sdk/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        if: steps.status.outputs.count != '0'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: release v${{ steps.pkg.outputs.version }}"
+          git tag "v${{ steps.pkg.outputs.version }}"
+          git push origin HEAD:main
+          git push origin "v${{ steps.pkg.outputs.version }}"
+
+      - name: No pending changesets
+        if: steps.status.outputs.count == '0'
+        run: echo "No pending changesets — nothing to release." | tee -a "$GITHUB_STEP_SUMMARY"
