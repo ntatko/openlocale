@@ -56,7 +56,7 @@ spec:
               name: http
           env:
             - name: OPENLOCALE_BASE_URL
-              value: https://openlocale-demo.example.com # ← set to the real tunnel hostname once chosen
+              value: https://demo.openlocale.org
             - name: OPENLOCALE_DB_URL
               value: file:/data/openlocale.db
             - name: OPENLOCALE_AI_MODEL
