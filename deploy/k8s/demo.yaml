@@ -63,6 +63,8 @@ spec:
               value: claude-opus-4-8
             - name: OPENLOCALE_MT_PROVIDER
               value: claude
+            - name: OPENLOCALE_DEMO_MODE
+              value: "true"
             - name: OPENLOCALE_AUTH_SECRET
               valueFrom:
                 secretKeyRef:
