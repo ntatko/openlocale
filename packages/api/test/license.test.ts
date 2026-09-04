@@ -41,7 +41,7 @@ const now = Math.floor(Date.now() / 1000);
 describe("license gating", () => {
   it("features report ai=false without a license", async () => {
     const res = await app.request("/api/v1/features");
-    expect((await res.json()).ai).toBe(false);
+    expect((await res.json() as any).ai).toBe(false);
   });
 
   it("AI translate returns 402 when unlicensed", async () => {
@@ -54,7 +54,7 @@ describe("license gating", () => {
       })
     });
     expect(res.status).toBe(402);
-    expect((await res.json()).error.code).toBe("FEATURE_UNLICENSED");
+    expect((await res.json() as any).error.code).toBe("FEATURE_UNLICENSED");
   });
 
   it("rejects invalid license keys", async () => {
@@ -88,10 +88,10 @@ describe("license gating", () => {
     expect(res.status).toBe(200);
 
     const features = await app.request("/api/v1/features");
-    expect((await features.json()).ai).toBe(true);
+    expect((await features.json() as any).ai).toBe(true);
 
     const status = await app.request("/api/v1/admin/license", { headers: { cookie } });
-    const body = await status.json();
+    const body = await status.json() as any;
     expect(body.valid).toBe(true);
     expect(body.plan).toBe("pro");
     expect(body.features).toContain("ai");

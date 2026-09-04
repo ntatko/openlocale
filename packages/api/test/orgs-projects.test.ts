@@ -30,7 +30,7 @@ describe("orgs + projects API", () => {
       body: JSON.stringify({ name: "Acme", slug: orgSlug })
     });
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.slug).toBe(orgSlug);
     expect(body.role).toBe("owner");
   });
@@ -38,7 +38,7 @@ describe("orgs + projects API", () => {
   it("lists the org for its member", async () => {
     const res = await app.request("/api/v1/orgs", { headers: { cookie } });
     expect(res.status).toBe(200);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.map((o: { slug: string }) => o.slug)).toContain(orgSlug);
   });
 
@@ -49,14 +49,14 @@ describe("orgs + projects API", () => {
       body: JSON.stringify({ name: "Website", slug: projectSlug, sourceLocale: "en" })
     });
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.sourceLocale).toBe("en");
 
     const locales = await app.request(`/api/v1/projects/${projectSlug}/locales`, {
       headers: { cookie }
     });
     expect(locales.status).toBe(200);
-    expect(await locales.json()).toEqual([{ locale: "en", version: 1, enabled: true }]);
+    expect(await locales.json() as any).toEqual([{ locale: "en", version: 1, enabled: true }]);
   });
 
   it("adds a locale", async () => {
@@ -88,7 +88,7 @@ describe("orgs + projects API", () => {
   it("serves the OpenAPI spec", async () => {
     const res = await app.request("/api/openapi.json");
     expect(res.status).toBe(200);
-    const spec = await res.json();
+    const spec = await res.json() as any;
     expect(spec.info.title).toBe("openlocale API");
     expect(Object.keys(spec.paths)).toContain("/api/v1/orgs");
   });

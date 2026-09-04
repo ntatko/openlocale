@@ -30,7 +30,7 @@ beforeAll(async () => {
     headers: { "content-type": "application/json", cookie },
     body: JSON.stringify({ name: "greeting" })
   });
-  keyId = (await keyRes.json()).id;
+  keyId = (await keyRes.json() as any).id;
 });
 
 afterAll(async () => {
@@ -45,7 +45,7 @@ describe("API tokens", () => {
       body: JSON.stringify({ name: "CI read", scopes: ["read"] })
     });
     expect(res.status).toBe(201);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.token).toMatch(/^olp_/);
     readToken = body.token;
 
@@ -58,7 +58,7 @@ describe("API tokens", () => {
         projectSlug
       })
     });
-    const writeBody = await writeRes.json();
+    const writeBody = await writeRes.json() as any;
     writeToken = writeBody.token;
     writeTokenId = writeBody.id;
   });
@@ -94,7 +94,7 @@ describe("API tokens", () => {
     const audit = await app.request(`/api/v1/projects/${projectSlug}/audit`, {
       headers: { cookie }
     });
-    const events = await audit.json();
+    const events = await audit.json() as any;
     const created = events.find((e: { action: string }) => e.action === "translation.created");
     expect(created.actorType).toBe("token");
     expect(created.payload.source).toBe("api");
@@ -137,7 +137,7 @@ describe("API tokens", () => {
       headers: { "content-type": "application/json", cookie },
       body: JSON.stringify({ name: "scoped", scopes: ["read"], projectSlug })
     });
-    const scopedToken = (await scoped.json()).token;
+    const scopedToken = (await scoped.json() as any).token;
 
     const allowed = await app.request(`/api/v1/projects/${projectSlug}/keys`, {
       headers: { authorization: `Bearer ${scopedToken}` }

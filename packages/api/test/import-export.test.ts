@@ -47,7 +47,7 @@ describe("import/export", () => {
       "en"
     );
     expect(res.status).toBe(201);
-    const job = await res.json();
+    const job = await res.json() as any;
     expect(job.stats).toMatchObject({ total: 2, create: 2, update: 0, unchanged: 0 });
 
     const commit = await app.request(`/api/v1/imports/${job.id}/commit`, {
@@ -55,12 +55,12 @@ describe("import/export", () => {
       headers: { cookie }
     });
     expect(commit.status).toBe(200);
-    expect((await commit.json()).stats).toMatchObject({ created: 2 });
+    expect((await commit.json() as any).stats).toMatchObject({ created: 2 });
 
     const keys = await app.request(`/api/v1/projects/${projectSlug}/keys`, {
       headers: { cookie }
     });
-    const body = await keys.json();
+    const body = await keys.json() as any;
     expect(body.total).toBe(2);
     expect(
       body.keys.find((k: { name: string }) => k.name === "checkout.title").translations.en.value
@@ -73,7 +73,7 @@ describe("import/export", () => {
       "json-nested",
       "en"
     );
-    const job = await res.json();
+    const job = await res.json() as any;
     expect(job.stats).toMatchObject({ total: 2, create: 0, update: 1, unchanged: 1 });
 
     await app.request(`/api/v1/imports/${job.id}/commit`, { method: "POST", headers: { cookie } });
@@ -81,7 +81,7 @@ describe("import/export", () => {
     const audit = await app.request(`/api/v1/projects/${projectSlug}/audit`, {
       headers: { cookie }
     });
-    const events = await audit.json();
+    const events = await audit.json() as any;
     const updated = events.find(
       (e: { action: string; payload: { source?: string } }) =>
         e.action === "translation.updated" && e.payload.source === "import"
@@ -91,7 +91,7 @@ describe("import/export", () => {
 
   it("cannot commit twice", async () => {
     const res = await importFile(JSON.stringify({ x: "y" }), "json-flat", "en");
-    const job = await res.json();
+    const job = await res.json() as any;
     await app.request(`/api/v1/imports/${job.id}/commit`, { method: "POST", headers: { cookie } });
     const again = await app.request(`/api/v1/imports/${job.id}/commit`, {
       method: "POST",
@@ -138,7 +138,7 @@ describe("import/export", () => {
     const xliff = await exportRes.text();
 
     const reimport = await importFile(xliff, "xliff12", "en", "reimport.xlf");
-    const job = await reimport.json();
+    const job = await reimport.json() as any;
     expect(job.stats.create).toBe(0);
     expect(job.stats.update).toBe(0);
     expect(job.stats.unchanged).toBe(job.stats.total);
@@ -150,7 +150,7 @@ describe("import/export", () => {
       headers: { "content-type": "application/json", cookie },
       body: JSON.stringify({ name: "ci", scopes: ["write"] })
     });
-    const token = (await tokenRes.json()).token;
+    const token = (await tokenRes.json() as any).token;
 
     const form = new FormData();
     form.set("file", new File([JSON.stringify({ fromCli: "hello" })], "cli.json"));

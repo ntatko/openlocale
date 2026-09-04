@@ -32,7 +32,7 @@ beforeAll(async () => {
       headers: { "content-type": "application/json", cookie },
       body: JSON.stringify({ name: "nav.home" })
     });
-    const keyId = (await keyRes.json()).id;
+    const keyId = (await keyRes.json() as any).id;
     await app.request(`/api/v1/projects/${slug}/keys/${keyId}/translations/en`, {
       method: "PUT",
       headers: { "content-type": "application/json", cookie },
@@ -44,7 +44,7 @@ beforeAll(async () => {
     headers: { "content-type": "application/json", cookie },
     body: JSON.stringify({ name: "delivery", scopes: ["read"] })
   });
-  readToken = (await tokenRes.json()).token;
+  readToken = (await tokenRes.json() as any).token;
 });
 
 afterAll(async () => {
@@ -55,7 +55,7 @@ describe("CDN delivery", () => {
   it("serves public bundles without credentials, with ETag", async () => {
     const res = await app.request(`/api/v1/cdn/${publicSlug}/en.json`);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ "nav.home": "Home" });
+    expect(await res.json() as any).toEqual({ "nav.home": "Home" });
     expect(res.headers.get("etag")).toMatch(/^W\//);
   });
 
@@ -72,7 +72,7 @@ describe("CDN delivery", () => {
     const keys = await app.request(`/api/v1/projects/${publicSlug}/keys`, {
       headers: { cookie }
     });
-    const keyId = (await keys.json()).keys[0].id;
+    const keyId = (await keys.json() as any).keys[0].id;
     await app.request(`/api/v1/projects/${publicSlug}/keys/${keyId}/translations/en`, {
       method: "PUT",
       headers: { "content-type": "application/json", cookie },
@@ -83,17 +83,17 @@ describe("CDN delivery", () => {
       headers: { "if-none-match": etag }
     });
     expect(fresh.status).toBe(200);
-    expect(await fresh.json()).toEqual({ "nav.home": "Homepage" });
+    expect(await fresh.json() as any).toEqual({ "nav.home": "Homepage" });
   });
 
   it("serves nested format", async () => {
     const res = await app.request(`/api/v1/cdn/${publicSlug}/en.json?format=nested`);
-    expect(await res.json()).toEqual({ nav: { home: "Homepage" } });
+    expect(await res.json() as any).toEqual({ nav: { home: "Homepage" } });
   });
 
   it("manifest lists locale versions", async () => {
     const res = await app.request(`/api/v1/cdn/${publicSlug}/manifest`);
-    const body = await res.json();
+    const body = await res.json() as any;
     expect(body.locales[0].locale).toBe("en");
     expect(body.locales[0].version).toBeGreaterThanOrEqual(2);
   });
@@ -132,7 +132,7 @@ describe("CDN delivery", () => {
     const keys = await app.request(`/api/v1/projects/${publicSlug}/keys`, {
       headers: { cookie }
     });
-    const keyId = (await keys.json()).keys[0].id;
+    const keyId = (await keys.json() as any).keys[0].id;
     await app.request(`/api/v1/projects/${publicSlug}/keys/${keyId}/translations/en`, {
       method: "PUT",
       headers: { "content-type": "application/json", cookie },
