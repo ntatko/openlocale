@@ -1,0 +1,31 @@
+name: Changeset check
+
+# Fails a PR that changes a platform package (anything changesets tracks —
+# see .changeset/config.json's "fixed" group) without an accompanying
+# changeset. See AGENTS.md for how to add one, and the empty-changeset
+# escape hatch for changes that don't warrant a release.
+#
+# This job only reports red/green on the PR — to actually block merging,
+# add "Changeset check" as a required status check under the repo's branch
+# protection rules for main.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec changeset status --since=origin/${{ github.base_ref }}

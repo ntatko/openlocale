@@ -14,9 +14,11 @@
     "test:pg": "OPENLOCALE_TEST_PG=1 turbo run test --filter=@openlocale/db --filter=@openlocale/api",
     "db:generate": "pnpm --filter @openlocale/db db:generate",
     "db:migrate": "pnpm --filter @openlocale/db db:migrate",
-    "seed": "pnpm --filter @openlocale/seed start"
+    "seed": "pnpm --filter @openlocale/seed start",
+    "changeset": "changeset"
   },
   "devDependencies": {
+    "@changesets/cli": "^3.0.2",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3"
   }
