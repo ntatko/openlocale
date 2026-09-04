@@ -1,0 +1,95 @@
+# Self-hosted GitHub Actions runner for github.com/ntatko/openlocale, used only
+# by the deploy-demo job in .github/workflows/docker-publish.yml.
+#
+# Runs as its own namespace (gha-runners) separate from openlocale-demo, and is
+# only granted RBAC to update the one Deployment it needs to (kubectl set image /
+# rollout status) — not cluster-admin, not access to any other namespace.
+#
+# SECURITY: this repo is public. The runner only ever fires on `push` to `main`
+# (see docker-publish.yml — never on pull_request), so only people who can push
+# to main can execute code on this cluster via the runner. Keep branch
+# protection on main; do not add pull_request triggers to jobs that use this
+# runner label.
+#
+# One-time setup:
+#   kubectl create namespace gha-runners
+#   kubectl -n gha-runners create secret generic gha-runner-pat \
+#     --from-literal=ACCESS_TOKEN=github_pat_…   # fine-grained PAT, this repo only,
+#                                                  # "Administration: read & write" scope
+#   kubectl apply -f demo-runner.yaml
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openlocale-demo-deployer
+  namespace: gha-runners
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: openlocale-demo-deployer
+  namespace: openlocale-demo
+rules:
+  - apiGroups: ["apps"]
+    resources: [deployments, replicasets]
+    verbs: [get, list, watch, update, patch]
+  - apiGroups: [""]
+    resources: [pods]
+    verbs: [get, list, watch]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openlocale-demo-deployer
+  namespace: openlocale-demo
+subjects:
+  - kind: ServiceAccount
+    name: openlocale-demo-deployer
+    namespace: gha-runners
+roleRef:
+  kind: Role
+  name: openlocale-demo-deployer
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openlocale-demo-runner
+  namespace: gha-runners
+  labels:
+    app: openlocale-demo-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openlocale-demo-runner
+  template:
+    metadata:
+      labels:
+        app: openlocale-demo-runner
+    spec:
+      serviceAccountName: openlocale-demo-deployer
+      containers:
+        - name: runner
+          image: myoung34/github-runner:latest
+          env:
+            - name: REPO_URL
+              value: https://github.com/ntatko/openlocale
+            - name: RUNNER_SCOPE
+              value: repo
+            - name: RUNNER_NAME
+              value: openlocale-demo-runner
+            - name: LABELS
+              value: openlocale-demo
+            - name: EPHEMERAL
+              value: "true"
+            - name: DISABLE_AUTO_UPDATE
+              value: "true"
+            - name: ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: gha-runner-pat
+                  key: ACCESS_TOKEN
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { memory: 512Mi }

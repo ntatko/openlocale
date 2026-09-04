@@ -39,7 +39,7 @@ spec:
     spec:
       containers:
         - name: openlocale
-          image: openlocale/openlocale:latest # ← your Docker Hub image
+          image: ghcr.io/ntatko/openlocale:latest # ← or your own registry/fork
           ports:
             - containerPort: 3000
               name: http

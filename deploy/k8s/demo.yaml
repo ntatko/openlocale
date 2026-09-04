@@ -1,0 +1,109 @@
+# openlocale demo environment — deployed to the operator's own k3s cluster by
+# .github/workflows/docker-publish.yml (job: deploy-demo) on every push to main.
+#
+# This is NOT the self-host template (see ../k8s/openlocale.yaml for that) — it's
+# the manifest for this specific demo instance: single replica, SQLite on a PVC,
+# no Ingress (a Cloudflare Tunnel already running elsewhere on the cluster routes
+# a public hostname straight to the Service below via in-cluster DNS).
+#
+# One-time setup on the cluster before the first deploy:
+#   kubectl create namespace openlocale-demo
+#   kubectl -n openlocale-demo create secret generic openlocale-demo \
+#     --from-literal=OPENLOCALE_AUTH_SECRET=$(openssl rand -hex 32) \
+#     --from-literal=ANTHROPIC_API_KEY=sk-ant-…
+#   kubectl apply -f demo.yaml
+#
+# The deploy job only ever runs `kubectl set image` + `rollout status` against
+# the Deployment below — it never re-applies this file, so the image tag here is
+# just the initial placeholder for `kubectl apply`.
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openlocale-demo-data
+  namespace: openlocale-demo
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 2Gi
+  # k3s: omit storageClassName to use the default local-path provisioner
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openlocale-demo
+  namespace: openlocale-demo
+  labels:
+    app: openlocale-demo
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate # RWO volume + SQLite: never run two writers
+  selector:
+    matchLabels:
+      app: openlocale-demo
+  template:
+    metadata:
+      labels:
+        app: openlocale-demo
+    spec:
+      containers:
+        - name: openlocale
+          image: ghcr.io/ntatko/openlocale:latest # ← overwritten by the deploy job on every push
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: OPENLOCALE_BASE_URL
+              value: https://openlocale-demo.example.com # ← set to the real tunnel hostname once chosen
+            - name: OPENLOCALE_DB_URL
+              value: file:/data/openlocale.db
+            - name: OPENLOCALE_AI_MODEL
+              value: claude-opus-4-8
+            - name: OPENLOCALE_MT_PROVIDER
+              value: claude
+            - name: OPENLOCALE_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: openlocale-demo
+                  key: OPENLOCALE_AUTH_SECRET
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: openlocale-demo
+                  key: ANTHROPIC_API_KEY
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            httpGet: { path: /api/health, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /api/health, port: http }
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            # no cpu request: node is a single 2-vCPU box already at ~99% of
+            # requestable cpu across other workloads — this is a low-traffic
+            # demo, best-effort cpu scheduling is fine.
+            requests: { memory: 256Mi }
+            limits: { memory: 768Mi }
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: openlocale-demo-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openlocale-demo
+  namespace: openlocale-demo
+spec:
+  selector:
+    app: openlocale-demo
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
