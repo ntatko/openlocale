@@ -1,0 +1,52 @@
+name: Publish npm packages
+
+# Publishes the public @openlocale/* packages (sdk, cli, i18next-backend) to
+# npm on version tags (v1.2.3), matching the tag scheme docker-publish.yml
+# uses for image tags. All three packages are versioned together from the
+# tag. Packages marked "private" (formats, dedupe, and everything under
+# apps/tools/examples) are skipped by `pnpm -r publish` and never touched.
+#
+# Requires an npm automation token in the NPM_TOKEN repository *secret*
+# (Settings -> Secrets and variables -> Actions -> Secrets), scoped to
+# publish under the @openlocale org on npmjs.com.
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # npm provenance
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+          scope: "@openlocale"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm test
+
+      - name: Set package versions from tag
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          for pkg in sdk cli i18next-backend; do
+            pnpm --filter "./packages/$pkg" exec -- npm pkg set "version=$VERSION"
+          done
+
+      - name: Publish
+        run: |
+          pnpm --filter "@openlocale/sdk" --filter "@openlocale/cli" --filter "@openlocale/i18next-backend" \
+            publish --no-git-checks --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

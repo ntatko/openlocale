@@ -11,6 +11,7 @@
     ".": "./src/index.ts"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -25,10 +26,10 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "@openlocale/formats": "workspace:*",
     "commander": "^14.0.0"
   },
   "devDependencies": {
+    "@openlocale/formats": "workspace:*",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
