@@ -5,9 +5,13 @@ name: Release
 # "fixed" group — apps, packages, and tools all move in lockstep, so a
 # web-only or API-only change can still drive a release, not just changes to
 # the published npm packages), commits that bump straight to main, and tags
-# it. This workflow does not publish anything itself: the tag it pushes is
-# what triggers docker-publish.yml and npm-publish.yml, which do the actual
-# releasing. Run it manually (Actions tab -> Release -> Run workflow) when
+# it. This workflow does not publish anything itself — docker-publish.yml
+# and npm-publish.yml do the actual releasing — but it must explicitly
+# dispatch them (see the last step): GitHub does not let a push/tag made
+# with the default GITHUB_TOKEN trigger other workflows' `push`/`tags`
+# events (loop-prevention), so without the explicit `gh workflow run` here
+# the tag this job pushes would just sit there and nothing downstream would
+# ever fire. Run it manually (Actions tab -> Release -> Run workflow) when
 # you're ready to cut a release.
 
 on:
@@ -18,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v4
 
@@ -62,6 +67,15 @@ jobs:
           git tag "v${{ steps.pkg.outputs.version }}"
           git push origin HEAD:main
           git push origin "v${{ steps.pkg.outputs.version }}"
+
+      - name: Trigger publish workflows
+        if: steps.status.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run npm-publish.yml --ref "v${{ steps.pkg.outputs.version }}"
+          gh workflow run docker-publish.yml --ref "v${{ steps.pkg.outputs.version }}"
 
       - name: No pending changesets
         if: steps.status.outputs.count == '0'
