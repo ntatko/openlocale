@@ -43,7 +43,7 @@ Switch by pointing `OPENLOCALE_DB_URL` at Postgres:
 OPENLOCALE_DB_URL=postgres://openlocale:secret@db:5432/openlocale
 ```
 
-The repo's [`docker-compose.yml`](https://github.com/openlocale/openlocale/blob/main/docker-compose.yml)
+The repo's [`docker-compose.yml`](https://github.com/ntatko/openlocale/blob/main/docker-compose.yml)
 includes a ready-to-use Postgres service. When multiple app instances share
 one Postgres, live translation events fan out to all of them automatically via
 `LISTEN/NOTIFY` — SSE clients can connect to any instance.
