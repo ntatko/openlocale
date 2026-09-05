@@ -3,7 +3,7 @@
 openlocale runs happily as a single pod — one container, one SQLite volume.
 This guide targets [k3s](https://k3s.io) (a home lab favorite) but applies to
 any cluster. Ready-made manifests live in
-[`deploy/k8s/openlocale.yaml`](https://github.com/openlocale/openlocale/blob/main/deploy/k8s/openlocale.yaml).
+[`deploy/k8s/openlocale.yaml`](https://github.com/ntatko/openlocale/blob/main/deploy/k8s/openlocale.yaml).
 
 ## Install
 

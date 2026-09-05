@@ -70,7 +70,7 @@ export default defineConfig({
       ]
     },
     search: { provider: "local" },
-    socialLinks: [{ icon: "github", link: "https://github.com/openlocale/openlocale" }],
+    socialLinks: [{ icon: "github", link: "https://github.com/ntatko/openlocale" }],
     footer: {
       message: "MIT licensed core. AI features unlock with a license key.",
       copyright: "© 2026 openlocale"

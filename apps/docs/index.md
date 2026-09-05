@@ -17,7 +17,7 @@ hero:
       link: /guide/what-is-openlocale
     - theme: alt
       text: GitHub
-      link: https://github.com/openlocale/openlocale
+      link: https://github.com/ntatko/openlocale
 
 features:
   - icon: ⚡

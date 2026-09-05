@@ -12,7 +12,7 @@ the development setup. For production deployment, see
 ## Run the server
 
 ```sh
-git clone https://github.com/openlocale/openlocale
+git clone https://github.com/ntatko/openlocale
 cd openlocale
 pnpm install
 pnpm seed      # demo data (optional but recommended)
